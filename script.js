@@ -1,6 +1,11 @@
 const $ = s => document.querySelector(s), byId = Object.fromEntries(websites.map(s => [s.id, s]));
 const { scores: PR, iterations } = computePageRank(websites, config), IN = computeInDegree(websites);
+const KW = config.oldAlgorithm !== "pagerank"; let OS = PR;
 const allIds = websites.map(s => s.id), fmt = v => v.toFixed(4);
+if (KW) {
+  $(".old header p").textContent = "Keyword matching · more repeated words ranks higher";
+  $(".explain article:first-child").innerHTML = "<h3>Old Google — Keyword matching</h3><p>Count how many times the search words appear on each page. The page with the most matches ranks first. It is simple, but anyone can cheat by repeating a word again and again, which is exactly what the spam site does.</p>";
+}
 document.querySelectorAll(".logo span").forEach((s, i) => s.style.setProperty("--i", i));
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -12,7 +17,7 @@ function card(id, rank, kind, other, delay) {
   const mv = isOld ? "" : `<span class="mv ${diff > 0 ? "up" : diff < 0 ? "dn" : "eq"}">${diff > 0 ? "▲ +" + diff : diff < 0 ? "▼ " + diff : "same rank"} vs Old</span>`;
   return `<li class="card ${rank === 1 ? "win" : ""} ${!isOld && changed ? "changed" : ""}" style="--d:${delay}">
     <div class="rk">${rank}</div><div><h3>${esc(s.name)}</h3><div class="u">https://${esc(s.url)}</div><p>${esc(s.description)}</p>${mv}</div>
-    <div class="sc"><span data-v="${isOld ? PR[id] : IN[id]}" data-d="${isOld ? 4 : 0}">0</span><small>${isOld ? "PageRank" : "incoming links"}</small></div></li>`;
+    <div class="sc"><span data-v="${isOld ? OS[id] : IN[id]}" data-d="${isOld && !KW ? 4 : 0}">0</span><small>${isOld ? (KW ? "keyword matches" : "PageRank") : "incoming links"}</small></div></li>`;
 }
 function search(q) {
   q = q.trim(); if (!q) return reset();
@@ -24,7 +29,7 @@ function render(q) {
   const m = matchSites(websites, q).map(s => s.id);
   $("#empty").hidden = m.length > 0; $("#cols").hidden = !m.length; $("#stats").hidden = !m.length; $("#why").hidden = !m.length;
   hit(m); if (!m.length) return;
-  const old = rankIds(m, PR), nw = rankIds(m, IN), oR = id => old.indexOf(id) + 1, nR = id => nw.indexOf(id) + 1;
+  OS = KW ? keywordScores(websites, q) : PR; const old = rankIds(m, OS), nw = rankIds(m, IN), oR = id => old.indexOf(id) + 1, nR = id => nw.indexOf(id) + 1;
   const changed = m.filter(id => oR(id) !== nR(id)).length;
   $("#oldList").innerHTML = old.map((id, i) => card(id, i + 1, "old", 0, i)).join("");
   $("#newList").innerHTML = nw.map((id, i) => card(id, i + 1, "new", oR(id), i)).join("");
@@ -32,7 +37,7 @@ function render(q) {
   $("#stats").innerHTML = [[m.length, "websites found for “" + esc(q) + "”"], [esc(byId[old[0]].name), "#1 under Old Google", 1], [esc(byId[nw[0]].name), "#1 under New Google", 1], [changed, "rankings changed"]]
     .map(([v, l, t]) => `<div class="stat"><b class="${t ? "t" : ""}">${v}</b><small>${l}</small></div>`).join("");
   const w = nw[0], ties = nw.filter(id => IN[id] === IN[w]).length > 1;
-  $("#why").innerHTML = changed ? `<b>Why they differ:</b> PageRank rewards links from <em>important</em> pages; link popularity only counts links. Highlighted cards moved between the two lists.`
+  $("#why").innerHTML = KW ? `<b>Why they differ:</b> Old Google just counts how often your words appear, so a page that repeats “${esc(q)}” can climb to the top. New Google ranks by how many other sites link to a page, and repeating words earns no links.${changed ? "" : " For this search both lists happen to agree."}` : changed ? `<b>Why they differ:</b> PageRank rewards links from <em>important</em> pages; link popularity only counts links. Highlighted cards moved between the two lists.`
     : `<b>Same order here.</b> “${esc(byId[w].name)}” has ${IN[w]} incoming links and sits where PageRank also puts it. The two methods only split when a page has few links from strong pages, or many links from weak ones.${ties ? " Equal link counts keep dataset order." : ""}`;
 }
 function reset() { $("#q").value = ""; $("#clear").hidden = true; $("#results").hidden = true; hit([]); $("#q").focus(); }

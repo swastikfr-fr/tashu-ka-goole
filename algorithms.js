@@ -39,4 +39,12 @@ function matchSites(sites, query) {
     return terms.every(t => hay.includes(t));
   });
 }
-if (typeof module !== "undefined") module.exports = { computePageRank, computeInDegree, rankIds, matchSites };
+/* OLD GOOGLE (keyword mode): score = how many times the search words appear in name, description, category and keywords. */
+function keywordScores(sites, query) {
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return Object.fromEntries(sites.map(s => {
+    const hay = [s.name, s.description, s.category, ...(s.keywords || [])].join(" ").toLowerCase();
+    return [s.id, terms.reduce((n, t) => n + hay.split(t).length - 1, 0)];
+  }));
+}
+if (typeof module !== "undefined") module.exports = { keywordScores, computePageRank, computeInDegree, rankIds, matchSites };

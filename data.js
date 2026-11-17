@@ -18,4 +18,5 @@ const websites = [
 const expectedNewAlgorithmWinner = "site-2";
 
 // Algorithm settings
-const config = { damping: 0.85, maxIterations: 100, tolerance: 1e-8 };
+// "keyword" = Old Google counts how often search words appear (spam-prone). "pagerank" = Old Google uses PageRank.
+const config = { oldAlgorithm: "keyword", damping: 0.85, maxIterations: 100, tolerance: 1e-8 };
