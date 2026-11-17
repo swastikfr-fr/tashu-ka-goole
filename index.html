@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tashu Ka Google — Same Internet. Two Algorithms.</title>
+<meta name="description" content="Compare PageRank with a link-popularity ranking, side by side.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="aura" aria-hidden="true"></div>
+<main>
+  <header class="hero">
+    <h1 class="logo" aria-label="Tashu Ka Google"><span style="--c:#4285f4">T</span><span style="--c:#ea4335">a</span><span style="--c:#fbbc05">s</span><span style="--c:#4285f4">h</span><span style="--c:#34a853">u</span><i></i><span style="--c:#ea4335">K</span><span style="--c:#fbbc05">a</span><i></i><span style="--c:#4285f4">G</span><span style="--c:#ea4335">o</span><span style="--c:#fbbc05">o</span><span style="--c:#4285f4">g</span><span style="--c:#34a853">l</span><span style="--c:#ea4335">e</span></h1>
+    <p class="tag">Same Internet. Two Algorithms. Different Results.</p>
+    <form id="form" class="search" role="search">
+      <label for="q" class="sr">Search the web</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Try “pizza”, “recipes” or “pune food”">
+      <button type="button" id="clear" class="ghost" aria-label="Clear search" hidden>✕</button>
+      <button type="submit" class="go" aria-label="Search"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    </form>
+  </header>
+
+  <section id="results" class="results" hidden aria-live="polite">
+    <div class="loader" id="loader" hidden><span></span><span></span><span></span></div>
+    <div id="stats" class="stats"></div>
+    <div id="empty" class="empty" hidden><b>No websites matched.</b><p>Try a broader word like “pizza” or “food”.</p></div>
+    <div id="cols" class="cols">
+      <section class="panel old" aria-labelledby="oh"><header><h2 id="oh">Old Google</h2><p>Traditional PageRank · authority flows through links</p></header><ol id="oldList"></ol></section>
+      <section class="panel new" aria-labelledby="nh"><header><h2 id="nh">New Google</h2><p>Modified Link Popularity · most incoming links wins</p></header><ol id="newList"></ol></section>
+    </div>
+    <p id="why" class="why"></p>
+  </section>
+
+  <section class="hood" id="hood">
+    <h2>Under the hood</h2>
+    <div class="explain">
+      <article><h3>Old Google — PageRank</h3><p>Every page starts equal. Each round, a page shares its score equally among the pages it links to. A link from a high-scoring page passes on more than one from a low-scoring page. We repeat (damping 0.85) until scores stop changing.</p></article>
+      <article><h3>New Google — Link Popularity</h3><p>Count how many different sites link to a page. The most incoming links ranks first. It ignores who is linking: a link from any site counts as one.</p></article>
+    </div>
+    <div class="netbar"><span>Size nodes by</span><button class="seg on" data-m="pr">PageRank</button><button class="seg" data-m="in">Incoming links</button><small>Hover or focus a node to see who links to it. Glowing nodes match your search.</small></div>
+    <div class="net"><svg id="net" viewBox="0 0 640 400" role="img" aria-label="Network of websites and the links between them"></svg><div id="tip" class="tip" hidden></div></div>
+  </section>
+
+  <section class="debug" id="debug"><details><summary>Developer checks</summary><div id="dbg"></div></details></section>
+</main>
+<script src="data.js"></script>
+<script src="algorithms.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
